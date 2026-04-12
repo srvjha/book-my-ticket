@@ -1,4 +1,6 @@
-# Book My Ticket
+# Stellar Cinema
+<img width="1366" height="617" alt="image" src="https://github.com/user-attachments/assets/855dc981-3b7b-4d3d-a71d-c34ff5d09a51" />
+
 
 A professional movie ticket booking system with a focus on security, concurrency management, and a premium user experience.
 
