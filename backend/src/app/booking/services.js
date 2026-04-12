@@ -29,15 +29,11 @@ class BookingService {
                 throw ApiError.badRequest("User not found");
             }
             const userId = userDetails.rows[0].id;
-            
-            // For now, let's assume show_id = 1 if not specified, 
-            // or fetch the first show's ID
             const showResult = await query("SELECT id FROM shows LIMIT 1");
             if (showResult.rowCount === 0) {
                 throw ApiError.badRequest("No shows available");
             }
             const showId = showResult.rows[0].id;
-
             const connection = await pool.connect();
 
             try {
