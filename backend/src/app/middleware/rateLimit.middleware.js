@@ -13,7 +13,7 @@ const globalLimiter = rateLimit({
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 5,
+  limit: 50,
    message: {
     statusCode: 429,
     message: "Too many requests. Please try again after 15 minutes.",
