@@ -7,6 +7,7 @@ export const userSanitize = (user) => {
   return {
     firstName: user.first_name,
     lastName: user.last_name ?? null,
+    username: user.username,
     email: user.email,
     createdAt: user.created_at,
     updatedAt: user.updated_at ?? null,

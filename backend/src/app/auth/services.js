@@ -21,6 +21,10 @@ class AuthenticationService {
     }
 
     const { salt, hashedPassword } = hashPassword(password, "");
+    if(username.trim().length === 0){
+      // generate randome username
+      username = firstName + lastName + Math.floor(Math.random() * 1000);
+    }
 
     const { rows } = await query(
       `INSERT INTO users
