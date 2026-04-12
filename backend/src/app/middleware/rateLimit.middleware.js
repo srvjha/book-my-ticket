@@ -27,7 +27,7 @@ const bookingLimiter = rateLimit({
   limit: 20,
    message: {
     statusCode: 429,
-    message: "Too many requests. Please try again after 15 minutes.",
+    message: "Too many requests. Please try again after 1 minute.",
     data: null,
     success: false,
   },
