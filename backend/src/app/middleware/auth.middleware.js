@@ -1,5 +1,4 @@
 import ApiError from "../../utils/api-error.js";
-import BaseDto from "../../dto/base.dto.js";
 import { verifyUserToken } from "../auth/utils/index.js";
 
 export function authMiddleware() {
