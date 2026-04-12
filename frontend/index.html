@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stellar Cinema | Premium Booking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #09090b;
+            color: #fafafa;
+        }
+
+        .zinc-border {
+            border-color: #27272a;
+        }
+
+        .zinc-bg {
+            background-color: #18181b;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+    <nav
+        class="border-b zinc-border px-6 py-4 flex justify-between items-center bg-zinc-950/50 backdrop-blur-md sticky top-0 z-50">
+        <div class="flex items-center gap-2">
+            <i data-lucide="clapperboard" class="w-6 h-6 text-emerald-500"></i>
+            <span class="text-xl font-bold tracking-tight">STELLAR<span class="text-zinc-500">CINEMA</span></span>
+        </div>
+        <div id="nav-auth" class="flex gap-6 items-center">
+            <!-- Auth injected here -->
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-6 py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-8">
+            <div class="space-y-8">
+                <div class="space-y-4">
+                    <span
+                        class="inline-block px-3 py-1 bg-emerald-500/10 text-emerald-500 text-xs font-bold uppercase tracking-widest rounded-full border border-emerald-500/20">Now
+                        Showing</span>
+                    <h1 class="text-6xl font-black leading-tight tracking-tighter">Dhurandhar<br><span
+                            class="text-zinc-500">The Revenge</span></h1>
+                    <p class="text-zinc-400 text-lg leading-relaxed max-w-lg">
+                        Experience the most awaited action thriller of 2026. A story of betrayal, redemption, and the
+                        ultimate sacrifice. Jassi is back in his most dangerous mission yet.
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-8 text-sm text-zinc-500 font-medium">
+                    <div class="flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4"></i> April 15, 2026
+                    </div>
+                    <div class="flex items-center gap-2"><i data-lucide="clock" class="w-4 h-4"></i> 165 mins</div>
+                    <div class="flex items-center gap-2"><i data-lucide="star"
+                            class="w-4 h-4 text-emerald-500 fill-emerald-500"></i> 4.9/5</div>
+                </div>
+
+                <button onclick=handleBooking()
+                    class="group relative px-8 py-4 bg-white text-black font-bold rounded-full overflow-hidden transition-all hover:scale-105 active:scale-95">
+                    <span class="relative z-10 flex items-center gap-2">Book Your Seats <i data-lucide="arrow-right"
+                            class="w-4 h-4 transition-transform group-hover:translate-x-1"></i></span>
+                </button>
+            </div>
+
+            <div class="relative group">
+                <div
+                    class="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-zinc-500 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200">
+                </div>
+                <div class="relative bg-zinc-900 rounded-3xl overflow-hidden border zinc-border shadow-2xl">
+                    <img src="https://assets-in.bmscdn.com/iedb/movies/images/mobile/thumbnail/xlarge/dhurandhar-the-revenge-et00478890-1772893614.jpg"
+                        class="w-full aspect-[4/5] object-cover opacity-80" alt="Movie Poster">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script>
+        async function init() {
+            lucide.createIcons();
+            const user = await checkAuth();
+            const navAuth = document.getElementById("nav-auth");
+            if (user) {
+                navAuth.innerHTML = `
+                    <span class="text-sm font-medium text-zinc-300">Welcome, ${user.firstName}</span>
+                    <button onclick="logout()" class="text-sm font-bold text-zinc-500 hover:text-white transition-colors">Sign Out</button>
+                `;
+            } else {
+                navAuth.innerHTML = `
+                    <a href="signin.html" class="text-sm font-bold hover:text-emerald-500 transition-colors">Sign In</a>
+                    <a href="signup.html" class="px-5 py-2 bg-zinc-100 text-black text-sm font-bold rounded-full hover:bg-white transition-all">Join Now</a>
+                `;
+            }
+        }
+        async function handleBooking() {
+            const user = await checkAuth();
+            if (!user) {
+                window.location.href = "signin.html";
+            } else {
+                window.location.href = "booking.html";
+            }
+        }
+        init();
+    </script>
+</body>
+
+</html>

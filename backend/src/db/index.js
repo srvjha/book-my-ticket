@@ -12,4 +12,4 @@ async function query(text, params) {
   }
 }
 
-export { query };
+export { query,pool };
