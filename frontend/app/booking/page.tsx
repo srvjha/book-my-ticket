@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useCallback, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { checkAuth, getSeats, bookSeats } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -14,8 +14,7 @@ interface Seat {
   isbooked?: boolean;
 }
 
-export default function Booking() {
-  const router = useRouter();
+function BookingContent() {
   const searchParams = useSearchParams();
   const [seats, setSeats] = useState<Seat[]>([]);
   const [loading, setLoading] = useState(true);
@@ -206,5 +205,17 @@ export default function Booking() {
         </div>
       </motion.div>
     </main>
+  );
+}
+
+export default function Booking() {
+  return (
+    <Suspense fallback={
+      <div className="flex-1 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    }>
+      <BookingContent />
+    </Suspense>
   );
 }
