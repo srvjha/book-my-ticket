@@ -1,5 +1,6 @@
 import authenticationService from "./services.js";
 import ApiResponse from "../../utils/api-response.js";
+import { cookieOptions } from "../../config/cookie.js";
 
 class AuthenticationController {
   async handleSignUp(req, res) {
@@ -25,15 +26,6 @@ class AuthenticationController {
       email,
       password,
     );
-
-    const isProduction = process.env.NODE_ENV === "production";
-
-    const cookieOptions = {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: "none",
-      path: "/",
-    };
 
     res.cookie("refreshToken", refreshToken, {
       ...cookieOptions,
@@ -62,15 +54,6 @@ class AuthenticationController {
     const { id } = req.user;
     await authenticationService.signOut(id);
 
-    const isProduction = process.env.NODE_ENV === "production";
-
-    const cookieOptions = {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: "none",
-      path: "/",
-    };
-
     ApiResponse.noContent({
       res: res.clearCookie("refreshToken", cookieOptions),
     });
@@ -80,15 +63,6 @@ class AuthenticationController {
     const { refreshToken: incomingRefreshToken } = req.cookies;
     const { accessToken, refreshToken } =
       await authenticationService.refreshTokens(incomingRefreshToken);
-
-    const isProduction = process.env.NODE_ENV === "production";
-
-    const cookieOptions = {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: "none",
-      path: "/",
-    };
 
     res.cookie("refreshToken", refreshToken, {
       ...cookieOptions,

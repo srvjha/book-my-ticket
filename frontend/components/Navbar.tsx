@@ -1,27 +1,18 @@
 "use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Clapperboard, LogOut, User } from "lucide-react";
+import { Clapperboard, LogOut } from "lucide-react";
 import { checkAuth, logout } from "@/lib/api";
+import useSWR from "swr";
 
 export default function Navbar() {
-  const [user, setUser] = useState<any>(null);
-
-  useEffect(() => {
-    const init = async () => {
-      const userData = await checkAuth();
-      setUser(userData);
-    };
-    init();
-  }, []);
+  const { data: user } = useSWR("/api/v1/auth/me", checkAuth);
 
   return (
     <nav className="border-b border-zinc-800 px-6 py-4 flex justify-between items-center bg-zinc-950/50 backdrop-blur-md sticky top-0 z-50">
       <Link href="/" className="flex items-center gap-2">
         <Clapperboard className="w-6 h-6 text-emerald-500" />
         <span className="text-xl font-bold tracking-tight">
-          STELLAR<span className="text-zinc-500">CINEMA</span>
+          Book<span className="text-zinc-500">MyTicket</span>
         </span>
       </Link>
       <div className="flex gap-6 items-center">
