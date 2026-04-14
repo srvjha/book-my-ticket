@@ -22,9 +22,9 @@ export default function Navbar() {
               Welcome, {user.firstName}
             </span>
             <button
-              onClick={() => {
-                logout();
-                mutate("/api/v1/auth/me", null);
+              onClick={async () => {
+                await logout();
+                mutate("/api/v1/auth/me", null, false);
               }}
               className="group flex items-center gap-2 text-sm font-bold text-zinc-500 hover:text-white transition-colors"
             >
