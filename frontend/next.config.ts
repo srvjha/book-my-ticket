@@ -29,12 +29,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "assets-in.bmscdn.com",
-        port: "",
-      },
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
+        hostname: "res.cloudinary.com",
         port: "",
       },
     ],

@@ -4,7 +4,8 @@ import bookingService from "./services.js"
 
 class BookingController{
     async seats(req, res){
-        const data = await bookingService.getAllSeats(req,res);
+        const { showId } = req.query;
+        const data = await bookingService.getAllSeats(showId);
         ApiResponse.ok({res,message:"Seats data fetched successfully",data})
     }
 
@@ -29,8 +30,8 @@ class BookingController{
     // }
 
     async bookSeats(req, res) {
-        const { seatIds, username } = req.body;
-        const data = await bookingService.bookSeats(seatIds, username);
+        const { seatIds, username, showId } = req.body;
+        const data = await bookingService.bookSeats(seatIds, username, showId);
         ApiResponse.ok({res,message:"Seats booked successfully",data})
     }
 }

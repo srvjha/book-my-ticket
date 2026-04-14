@@ -77,9 +77,7 @@ export default function Home() {
                         width={500}
                         height={500}
                         loading="eager"
-                        src={
-                          "https://assets-in.bmscdn.com/iedb/movies/images/mobile/thumbnail/xlarge/dhurandhar-the-revenge-et00478890-1772893614.jpg"
-                        }
+                        src={movie.banner_url}
                         alt={movie.movie_name}
                         className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
                       />

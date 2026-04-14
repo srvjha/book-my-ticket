@@ -12,6 +12,7 @@ interface Seat {
   id: number;
   is_booked?: boolean;
   isbooked?: boolean;
+  booked_by_username?: string;
 }
 
 function BookingContent() {
@@ -22,17 +23,19 @@ function BookingContent() {
   const [bookingInProgress, setBookingInProgress] = useState(false);
 
   // Get movie details from URL
+  const showId = searchParams.get("id");
   const movieTitle = searchParams.get("title") || "Dhurandhar: The Revenge";
   const movieSubtitle = searchParams.get("subtitle") || "";
   const moviePoster =
     searchParams.get("poster") ||
     "https://assets-in.bmscdn.com/iedb/movies/images/mobile/thumbnail/xlarge/dhurandhar-the-revenge-et00478890-1772893614.jpg";
 
-  const { data: userData, isLoading } = useSWR("auth/me", checkAuth);
+  const { data: userData, isLoading } = useSWR("/api/v1/auth/me", checkAuth);
 
   const loadSeats = useCallback(async () => {
+    if (!showId) return;
     try {
-      const result = await getSeats();
+      const result = await getSeats(showId);
       if (result.success) {
         setSeats(result.data.sort((a: Seat, b: Seat) => a.id - b.id));
       }
@@ -41,7 +44,11 @@ function BookingContent() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [showId]);
+
+  const myBookedSeats = seats.filter(
+    (s) => (s.is_booked || s.isbooked) && s.booked_by_username === userData?.username
+  );
 
   useEffect(() => {
     loadSeats();
@@ -54,11 +61,11 @@ function BookingContent() {
   };
 
   const handleCheckout = async () => {
-    if (selectedSeats.length === 0) return;
+    if (selectedSeats.length === 0 || !showId) return;
     setBookingInProgress(true);
 
     try {
-      const result = await bookSeats(selectedSeats, userData.username);
+      const result = await bookSeats(selectedSeats, userData.username, showId);
       if (result.success) {
         alert(`Successfully booked ${selectedSeats.length} seats!`);
         setSelectedSeats([]);
@@ -203,6 +210,25 @@ function BookingContent() {
             Selected
           </div>
         </div>
+
+        {/* My Booked Seats List */}
+        {myBookedSeats.length > 0 && (
+          <div className="mt-12 pt-8 border-t border-zinc-800/50">
+            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400 mb-4">
+              Your Booked Seats
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {myBookedSeats.map((s) => (
+                <div
+                  key={s.id}
+                  className="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-500 text-[10px] font-black"
+                >
+                  SEAT {s.id}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </motion.div>
     </main>
   );
@@ -210,11 +236,13 @@ function BookingContent() {
 
 export default function Booking() {
   return (
-    <Suspense fallback={
-      <div className="flex-1 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex-1 flex items-center justify-center">
+          <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      }
+    >
       <BookingContent />
     </Suspense>
   );

@@ -29,8 +29,10 @@ export async function logout() {
 }
 
 // Booking APIs
-export async function getSeats() {
-  const res = await apiClient.get("/seats");
+export async function getSeats(showId?: string) {
+  const res = await apiClient.get("/seats", {
+    params: { showId },
+  });
   return res.data;
 }
 
@@ -44,7 +46,11 @@ export async function getShow(id: string) {
   return res.data;
 }
 
-export async function bookSeats(seatIds: number[], username: string) {
-  const res = await apiClient.post("/book", { seatIds, username });
+export async function bookSeats(
+  seatIds: number[],
+  username: string,
+  showId: string,
+) {
+  const res = await apiClient.post("/book", { seatIds, username, showId });
   return res.data;
 }

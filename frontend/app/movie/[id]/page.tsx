@@ -47,15 +47,13 @@ export default function MovieDetail({ params }: MovieDetailProps) {
     );
   }
 
-  const movie = enrichShow(data.data, Number(id));
+  const movie = enrichShow(data.data);
 
   const handleBooking = async () => {
     setBookingLoading(true);
     const user = await checkAuth();
-    const bookingUrl = `/booking?title=${encodeURIComponent(movie.movie_name)}&subtitle=${encodeURIComponent(movie.subtitle)}&poster=${encodeURIComponent(movie.poster)}`;
-    console.log("isUser : ", user);
+    const bookingUrl = `/booking?id=${id}&title=${encodeURIComponent(movie.movie_name)}&subtitle=${encodeURIComponent(movie.subtitle)}&poster=${encodeURIComponent(movie.banner_url)}`;
     if (!user) {
-      console.log("user not logged in");
       router.push(`/signin?redirect=${encodeURIComponent(bookingUrl)}`);
     } else {
       router.push(bookingUrl);
@@ -115,7 +113,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
           >
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />{" "}
-              {new Date(movie.show_time).toLocaleDateString()}
+              {new Date(movie.start_time).toLocaleDateString()}
             </div>
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4" /> {movie.duration}
@@ -154,7 +152,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
               width={500}
               height={500}
               loading="eager"
-              src={movie.poster}
+              src={movie.banner_url}
               className="w-full aspect-[4/5] object-cover opacity-80"
               alt={movie.movie_name}
             />

@@ -2,33 +2,43 @@ import { pool, query } from "../../db/index.js";
 import ApiError from "../../utils/api-error.js";
 
 class BookingService {
-    async getAllSeats() {
+    async getAllSeats(showId) {
         const results = await query(
             `
             SELECT
-            s.id,
-            s.row_number,
-            s.seat_number,
-            s.seat_type,
-            ss.price,
-            ss.is_booked
+                s.id,
+                s.row_number,
+                s.seat_number,
+                s.seat_type,
+                ss.price,
+                ss.is_booked,
+                (
+                    SELECT u.username 
+                    FROM bookings b 
+                    JOIN users u ON u.id = b.user_id 
+                    WHERE b.seat_id = s.id AND b.show_id = $1 
+                    LIMIT 1
+                ) as booked_by_username
             FROM seats s
-            LEFT JOIN show_seats ss ON s.id = ss.seat_id
-            `
+            JOIN show_seats ss ON s.id = ss.seat_id
+            WHERE ss.show_id = $1
+            ORDER BY s.row_number, s.seat_number
+            `,
+            [showId]
         )
         return results.rows
     }
 
     async getAllShows() {
         const results = await query(
-            `SELECT id, movie_name, start_time FROM shows`
+            `SELECT id, movie_name, start_time,banner_url FROM shows`
         );
         return results.rows;
     }
 
     async getShowById(id) {
         const results = await query(
-            `SELECT id, movie_name, start_time FROM shows WHERE id = $1`,
+            `SELECT id, movie_name, start_time,banner_url FROM shows WHERE id = $1`,
             [id]
         );
         return results.rows[0];
@@ -103,20 +113,19 @@ class BookingService {
     Here I have used multiple seatIds to book multiple seats at once to achieve atomicity.
     */
 
-    async bookSeats(seatIds, username) {
+    async bookSeats(seatIds, username, showId) {
         try {
             const userResult = await query(`SELECT id FROM users WHERE username = $1`, [username]);
             if (userResult.rowCount === 0) throw ApiError.badRequest("User not found");
             const userId = userResult.rows[0].id;
 
-            const showResult = await query("SELECT id FROM shows LIMIT 1");
-            if (showResult.rowCount === 0) throw ApiError.badRequest("No shows available");
-            const showId = showResult.rows[0].id;
+            if (!showId) throw ApiError.badRequest("Show ID is required");
 
             const connection = await pool.connect();
             try {
                 await connection.query("BEGIN");
                 
+                // 1. Verify availability and lock rows
                 const checkSql = `
                     SELECT ss.seat_id
                     FROM show_seats ss
@@ -130,6 +139,7 @@ class BookingService {
                     throw ApiError.badRequest("One or more seats are already booked or unavailable");
                 }
 
+                // 2. Mark as booked
                 const updateSQL = `
                     UPDATE show_seats
                     SET is_booked = true
@@ -137,6 +147,7 @@ class BookingService {
                 `;
                 await connection.query(updateSQL, [seatIds, showId]);
 
+                // 3. Record the bookings
                 const bookings = [];
                 for (const seatId of seatIds) {
                     const insertSQL = `
