@@ -31,7 +31,7 @@ class AuthenticationController {
     const cookieOptions = {
       httpOnly: true,
       secure: isProduction,
-      sameSite: "lax",
+      sameSite: "none",
       path: "/",
     };
 
@@ -67,7 +67,7 @@ class AuthenticationController {
     const cookieOptions = {
       httpOnly: true,
       secure: isProduction,
-      sameSite: "lax",
+      sameSite: "none",
       path: "/",
     };
 
@@ -86,7 +86,7 @@ class AuthenticationController {
     const cookieOptions = {
       httpOnly: true,
       secure: isProduction,
-      sameSite: "lax",
+      sameSite: "none",
       path: "/",
     };
 
