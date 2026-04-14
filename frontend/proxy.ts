@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const refreshToken = request.cookies.get("refreshToken");
+  const refreshToken = request.cookies.get("refreshToken")?.value;
 
   const protectedPaths = ["/booking"];
   const isProtectedPath = protectedPaths.some((path) =>

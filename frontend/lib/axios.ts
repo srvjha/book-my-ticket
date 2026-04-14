@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { getToken, setToken } from "./auth-storage";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE = "";
 
 interface AxiosRequestConfigWithRetry extends AxiosRequestConfig {
   _retry?: boolean;
