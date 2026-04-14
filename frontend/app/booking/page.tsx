@@ -7,6 +7,7 @@ import { checkAuth, getSeats, bookSeats } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import useSWR from "swr";
 import Image from "next/image";
+import { toast } from "react-hot-toast";
 
 interface Seat {
   id: number;
@@ -67,15 +68,15 @@ function BookingContent() {
     try {
       const result = await bookSeats(selectedSeats, userData.username, showId);
       if (result.success) {
-        alert(`Successfully booked ${selectedSeats.length} seats!`);
+        toast.success(`Successfully booked ${selectedSeats.length} seats!`);
         setSelectedSeats([]);
         await loadSeats();
       } else {
-        alert(result.message || "Booking failed.");
+        toast.error(result.message || "Booking failed.");
       }
     } catch (err: any) {
       console.error("Booking error", err);
-      alert(err.response?.data?.message || "Booking failed. Please try again.");
+      toast.error(err.response?.data?.message || "Booking failed. Please try again.");
     } finally {
       setBookingInProgress(false);
     }

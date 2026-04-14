@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import apiClient from "@/lib/axios";
+import { toast } from "react-hot-toast";
 
 export default function SignUp() {
   const router = useRouter();
@@ -15,7 +16,6 @@ export default function SignUp() {
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
     const formData = new FormData(e.currentTarget);
     const payload = Object.fromEntries(formData.entries());
@@ -24,17 +24,21 @@ export default function SignUp() {
       const res = await apiClient.post("/api/v1/auth/signup", payload);
       const data = res.data;
       if (data.success) {
+        toast.success("Account created successfully!");
         setSuccess(true);
         setTimeout(() => {
           router.push("/signin");
         }, 2000);
       } else {
-        setError(data.message || "Registration failed");
+        toast.error(data.message || "Registration failed");
       }
     } catch (err: any) {
-      setError(
-        err.response.data.message || "Sign up failed. Please try again.",
-      );
+      const serverMessage = err.response?.data?.message || "";
+      if (serverMessage.toLowerCase().includes("user already exists")) {
+        toast.error("User already exists. Please try another email.");
+      } else {
+        toast.error(serverMessage || "Sign up failed. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -55,17 +59,7 @@ export default function SignUp() {
             </p>
           </div>
 
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 rounded-xl text-sm font-medium text-center">
-              {error}
-            </div>
-          )}
 
-          {success && (
-            <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 px-4 py-3 rounded-xl text-sm font-medium text-center">
-              Account created successfully! Redirecting to sign in...
-            </div>
-          )}
 
           <form onSubmit={handleSignUp} className="space-y-4">
             <div className="space-y-1">
@@ -101,7 +95,6 @@ export default function SignUp() {
                 <input
                   type="text"
                   name="lastName"
-                  required
                   placeholder="Doe"
                   className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all placeholder:text-zinc-700"
                 />

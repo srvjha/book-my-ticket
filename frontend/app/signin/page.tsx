@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { setToken, checkAuth } from "@/lib/api";
 import apiClient from "@/lib/axios";
 import { mutate } from "swr";
+import { toast } from "react-hot-toast";
 
 function SignInContent() {
   const router = useRouter();
@@ -17,7 +18,6 @@ function SignInContent() {
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email");
@@ -33,16 +33,17 @@ function SignInContent() {
         setToken(data.data.accessToken);
         const userData = await checkAuth();
         if (userData) {
+          toast.success(`Welcome back, ${userData.username}!`);
           // Update SWR cache globally
           mutate("/api/v1/auth/me", userData);
           const redirect = searchParams.get("redirect") || "/";
           router.push(redirect);
         }
       } else {
-        setError(data.message || "Invalid credentials");
+        toast.error(data.message || "Invalid credentials");
       }
     } catch (err: any) {
-      setError(err.response.data.message || "Login failed. Please try again.");
+      toast.error(err.response?.data?.message || "Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -63,11 +64,7 @@ function SignInContent() {
             </p>
           </div>
 
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 rounded-xl text-sm font-medium text-center">
-              {error}
-            </div>
-          )}
+
 
           <form onSubmit={handleSignIn} className="space-y-6">
             <div className="space-y-2">

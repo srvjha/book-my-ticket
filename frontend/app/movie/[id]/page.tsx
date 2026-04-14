@@ -8,6 +8,7 @@ import { checkAuth, getShow } from "@/lib/api";
 import useSWR from "swr";
 import { enrichShow } from "@/lib/movie";
 import Image from "next/image";
+import { toast } from "react-hot-toast";
 
 interface MovieDetailProps {
   params: Promise<{ id: string }>;
@@ -50,15 +51,22 @@ export default function MovieDetail({ params }: MovieDetailProps) {
   const movie = enrichShow(data.data);
 
   const handleBooking = async () => {
-    setBookingLoading(true);
-    const user = await checkAuth();
-    const bookingUrl = `/booking?id=${id}&title=${encodeURIComponent(movie.movie_name)}&subtitle=${encodeURIComponent(movie.subtitle)}&poster=${encodeURIComponent(movie.banner_url)}`;
-    if (!user) {
-      router.push(`/signin?redirect=${encodeURIComponent(bookingUrl)}`);
-    } else {
-      router.push(bookingUrl);
+    try {
+      setBookingLoading(true);
+      const user = await checkAuth();
+      const bookingUrl = `/booking?id=${id}&title=${encodeURIComponent(movie.movie_name)}&subtitle=${encodeURIComponent(movie.subtitle)}&poster=${encodeURIComponent(movie.banner_url)}`;
+      if (!user) {
+        toast.error("Please sign in to book tickets");
+        router.push(`/signin?redirect=${encodeURIComponent(bookingUrl)}`);
+      } else {
+        router.push(bookingUrl);
+      }
+    } catch (err: any) {
+      toast.error("An error occurred. Please try again.");
+      console.error(err);
+    } finally {
+      setBookingLoading(false);
     }
-    setBookingLoading(false);
   };
 
   return (
