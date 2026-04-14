@@ -31,8 +31,10 @@ export default function SignUp() {
       } else {
         setError(data.message || "Registration failed");
       }
-    } catch (err) {
-      setError("Sign up failed. Please try again.");
+    } catch (err: any) {
+      setError(
+        err.response.data.message || "Sign up failed. Please try again.",
+      );
     } finally {
       setLoading(false);
     }

@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { Clapperboard, LogOut } from "lucide-react";
 import { checkAuth, logout } from "@/lib/api";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 
 export default function Navbar() {
   const { data: user } = useSWR("/api/v1/auth/me", checkAuth);
@@ -22,7 +22,10 @@ export default function Navbar() {
               Welcome, {user.firstName}
             </span>
             <button
-              onClick={() => logout()}
+              onClick={() => {
+                logout();
+                mutate("/api/v1/auth/me", null);
+              }}
               className="group flex items-center gap-2 text-sm font-bold text-zinc-500 hover:text-white transition-colors"
             >
               <LogOut className="w-4 h-4 group-hover:text-emerald-500 transition-colors" />

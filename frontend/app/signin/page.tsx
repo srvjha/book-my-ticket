@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { setToken, checkAuth } from "@/lib/api";
 import apiClient from "@/lib/axios";
+import { mutate } from "swr";
 
 function SignInContent() {
   const router = useRouter();
@@ -32,15 +33,16 @@ function SignInContent() {
         setToken(data.data.accessToken);
         const userData = await checkAuth();
         if (userData) {
+          // Update SWR cache globally
+          mutate("/api/v1/auth/me", userData);
           const redirect = searchParams.get("redirect") || "/";
           router.push(redirect);
-          setTimeout(() => router.refresh(), 100);
         }
       } else {
         setError(data.message || "Invalid credentials");
       }
-    } catch (err) {
-      setError("Login failed. Please try again.");
+    } catch (err: any) {
+      setError(err.response.data.message || "Login failed. Please try again.");
     } finally {
       setLoading(false);
     }

@@ -13,7 +13,6 @@ export const metadata: Metadata = {
   description: "Experience cinema like never before with Book My Ticket.",
 };
 
-
 export default function RootLayout({
   children,
 }: Readonly<{
