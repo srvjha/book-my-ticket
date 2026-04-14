@@ -26,9 +26,11 @@ class AuthenticationController {
       password,
     );
 
+    const isProduction = process.env.NODE_ENV === "production";
+
     const cookieOptions = {
       httpOnly: true,
-      secure: true,
+      secure: isProduction,
       sameSite: "lax",
       path: "/",
     };
@@ -60,9 +62,11 @@ class AuthenticationController {
     const { id } = req.user;
     await authenticationService.signOut(id);
 
+    const isProduction = process.env.NODE_ENV === "production";
+
     const cookieOptions = {
       httpOnly: true,
-      secure: true,
+      secure: isProduction,
       sameSite: "lax",
       path: "/",
     };
@@ -77,9 +81,11 @@ class AuthenticationController {
     const { accessToken, refreshToken } =
       await authenticationService.refreshTokens(incomingRefreshToken);
 
+    const isProduction = process.env.NODE_ENV === "production";
+
     const cookieOptions = {
       httpOnly: true,
-      secure: true,
+      secure: isProduction,
       sameSite: "lax",
       path: "/",
     };
