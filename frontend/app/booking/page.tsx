@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { checkAuth, getSeats, bookSeats } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { ConfirmationDialog } from "@/components/ui/ConfirmationDialog";
 import useSWR from "swr";
 import Image from "next/image";
 import { toast } from "react-hot-toast";
@@ -22,6 +23,7 @@ function BookingContent() {
   const [loading, setLoading] = useState(true);
   const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
   const [bookingInProgress, setBookingInProgress] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   // Get movie details from URL
   const showId = searchParams.get("id");
@@ -61,7 +63,12 @@ function BookingContent() {
     );
   };
 
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
+    if (selectedSeats.length === 0 || !showId) return;
+    setShowConfirmation(true);
+  };
+
+  const handleConfirmBooking = async () => {
     if (selectedSeats.length === 0 || !showId) return;
     setBookingInProgress(true);
 
@@ -70,6 +77,7 @@ function BookingContent() {
       if (result.success) {
         toast.success(`Successfully booked ${selectedSeats.length} seats!`);
         setSelectedSeats([]);
+        setShowConfirmation(false);
         await loadSeats();
       } else {
         toast.error(result.message || "Booking failed.");
@@ -80,6 +88,12 @@ function BookingContent() {
     } finally {
       setBookingInProgress(false);
     }
+  };
+
+  const handleCancelBooking = () => {
+    setShowConfirmation(false);
+    setBookingInProgress(false);
+    toast.error("Booking confirmation cancelled.");
   };
 
   if (isLoading || !userData || loading) {
@@ -147,7 +161,7 @@ function BookingContent() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleCheckout}
-            disabled={selectedSeats.length === 0 || bookingInProgress}
+            disabled={selectedSeats.length === 0 || bookingInProgress || showConfirmation}
             className="w-full bg-emerald-500 text-black font-black py-4 rounded-xl shadow-lg shadow-emerald-500/20 hover:bg-emerald-400 transition-all disabled:opacity-50 disabled:grayscale"
           >
             {bookingInProgress ? "Processing..." : "Checkout Now"}
@@ -171,7 +185,7 @@ function BookingContent() {
 
         {/* Grid */}
         <div className="overflow-x-auto pb-4">
-          <div className="grid grid-cols-8 gap-3 min-w-[320px] max-w-fit mx-auto">
+          <div className="grid grid-cols-8 gap-4 min-w-[320px] max-w-fit mx-auto">
             {seats.map((seat) => {
               const isBooked = seat.is_booked || seat.isbooked;
               const isSelected = selectedSeats.includes(seat.id);
@@ -182,7 +196,7 @@ function BookingContent() {
                   disabled={isBooked}
                   onClick={() => toggleSeat(seat.id)}
                   className={cn(
-                    "w-full aspect-square rounded-lg text-xs font-bold flex items-center justify-center transition-all",
+                    "w-10 h-10 aspect-square rounded-lg text-xs font-bold flex items-center justify-center transition-all",
                     isBooked
                       ? "bg-zinc-950 border border-zinc-800 text-zinc-800 cursor-not-allowed"
                       : isSelected
@@ -231,6 +245,19 @@ function BookingContent() {
           </div>
         )}
       </motion.div>
+
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={showConfirmation}
+        title="Confirm Booking"
+        description="Please review your booking details before confirming. This confirmation will expire in 1 minute."
+        selectedSeats={selectedSeats}
+        totalPrice={selectedSeats.length * 150}
+        timeoutDuration={60}
+        onConfirm={handleConfirmBooking}
+        onCancel={handleCancelBooking}
+        isLoading={bookingInProgress}
+      />
     </main>
   );
 }
