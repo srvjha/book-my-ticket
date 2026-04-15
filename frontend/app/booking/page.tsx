@@ -12,6 +12,7 @@ import { toast } from "react-hot-toast";
 
 interface Seat {
   id: number;
+  seatNumber?: number;
   is_booked?: boolean;
   isbooked?: boolean;
   booked_by_username?: string;
@@ -40,7 +41,12 @@ function BookingContent() {
     try {
       const result = await getSeats(showId);
       if (result.success) {
-        setSeats(result.data.sort((a: Seat, b: Seat) => a.id - b.id));
+        const sortedSeats = result.data.sort((a: Seat, b: Seat) => a.id - b.id);
+        const seatsWithNumbers = sortedSeats.map((seat: Seat, index: number) => ({
+          ...seat,
+          seatNumber: index + 1,
+        }));
+        setSeats(seatsWithNumbers);
       }
     } catch (err) {
       console.error("Failed to load seats", err);
@@ -150,7 +156,14 @@ function BookingContent() {
           <div className="flex justify-between items-center text-sm">
             <span className="text-zinc-500 font-medium">Selected Seats</span>
             <span className="font-bold text-emerald-500">
-              {selectedSeats.length > 0 ? selectedSeats.join(", ") : "None"}
+              {selectedSeats.length > 0
+                ? selectedSeats
+                    .map(
+                      (id) =>
+                        seats.find((s) => s.id === id)?.seatNumber || id,
+                    )
+                    .join(", ")
+                : "None"}
             </span>
           </div>
           <div className="flex justify-between items-center text-sm">
@@ -206,7 +219,7 @@ function BookingContent() {
                         : "bg-zinc-800 text-zinc-500 hover:bg-zinc-700 hover:text-zinc-300",
                   )}
                 >
-                  {seat.id}
+                  {seat.seatNumber}
                 </button>
               );
             })}
@@ -240,7 +253,7 @@ function BookingContent() {
                   key={s.id}
                   className="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-500 text-[10px] font-black"
                 >
-                  SEAT {s.id}
+                  SEAT {s.seatNumber}
                 </div>
               ))}
             </div>
