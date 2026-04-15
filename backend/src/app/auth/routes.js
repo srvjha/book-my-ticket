@@ -8,7 +8,7 @@ import {
   SignUpDto,
   SignInDto,
 } from "./models.js";
-import { authLimiter, globalLimiter } from "../middleware/rateLimit.middleware.js";
+import { authLimiter } from "../middleware/rateLimit.middleware.js";
 const authController = new AuthenticationController();
 const router = express.Router();
 
@@ -28,18 +28,16 @@ router.post(
 router.get(
   "/me",
   restrictToAuthenticatedUser(),
-  globalLimiter,
   authController.handleMe.bind(authController),
 );
 
 router.post(
   "/signout",
   restrictToAuthenticatedUser(),
-  globalLimiter,
   authController.handleSignOut.bind(authController),
 );
 
-router.post("/refresh/token", globalLimiter, authController.refreshToken.bind(authController));
+router.post("/refresh/token", authController.refreshToken.bind(authController));
 
 
 
