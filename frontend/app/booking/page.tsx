@@ -98,7 +98,7 @@ function BookingContent() {
         animate={{ opacity: 1, x: 0 }}
         className="space-y-8"
       >
-        <div className="relative rounded-2xl overflow-hidden border border-zinc-800 shadow-xl aspect-[2/3] max-w-[200px] mx-auto lg:mx-0">
+        <div className="relative rounded-2xl overflow-hidden border border-zinc-800 shadow-xl aspect-2/3 max-w-50 mx-auto lg:mx-0">
           <Image
             width={200}
             height={300}
@@ -162,7 +162,7 @@ function BookingContent() {
         className="lg:col-span-2 bg-zinc-900/30 rounded-3xl border border-zinc-800 p-8 md:p-12 relative overflow-hidden h-fit"
       >
         {/* Screen Arc */}
-        <div className="max-w-[400px] mx-auto mb-16 relative">
+        <div className="max-w-100 mx-auto mb-16 relative">
           <div className="w-full h-1 bg-emerald-500 rounded-full shadow-[0_4px_24px_rgba(16,185,129,0.5)]"></div>
           <div className="text-center text-[10px] uppercase tracking-[0.4em] font-black text-zinc-600 mt-4">
             Cinema Screen
