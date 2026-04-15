@@ -54,8 +54,10 @@ class AuthenticationController {
     const { id } = req.user;
     await authenticationService.signOut(id);
 
-    ApiResponse.noContent({
-      res: res.clearCookie("refreshToken", cookieOptions),
+    res.clearCookie("refreshToken", cookieOptions);
+    ApiResponse.ok({
+      res,
+      message: "User signed out successfully",
     });
   }
 

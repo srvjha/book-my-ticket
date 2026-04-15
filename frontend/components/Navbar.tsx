@@ -1,11 +1,27 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Clapperboard, LogOut } from "lucide-react";
 import { checkAuth, logout } from "@/lib/api";
 import useSWR, { mutate } from "swr";
+import { useState } from "react";
 
 export default function Navbar() {
   const { data: user } = useSWR("/api/v1/auth/me", checkAuth);
+  const router = useRouter();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      mutate("/api/v1/auth/me", null, false);
+      router.push("/");
+    } catch (error) {
+      console.error("Signout error:", error);
+      setIsLoggingOut(false);
+    }
+  };
 
   return (
     <nav className="border-b border-zinc-800 px-6 py-4 flex justify-between items-center bg-zinc-950/50 backdrop-blur-md sticky top-0 z-50">
@@ -22,14 +38,21 @@ export default function Navbar() {
               Welcome, {user.firstName}
             </span>
             <button
-              onClick={async () => {
-                await logout();
-                mutate("/api/v1/auth/me", null, false);
-              }}
-              className="group flex items-center gap-2 text-sm font-bold text-zinc-500 hover:text-white transition-colors"
+              onClick={handleSignOut}
+              disabled={isLoggingOut}
+              className="group flex items-center gap-2 text-sm font-bold text-zinc-500 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <LogOut className="w-4 h-4 group-hover:text-emerald-500 transition-colors" />
-              Sign Out
+              {isLoggingOut ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-zinc-400 border-t-emerald-500 rounded-full animate-spin" />
+                  Signing Out...
+                </>
+              ) : (
+                <>
+                  <LogOut className="w-4 h-4 group-hover:text-emerald-500 transition-colors" />
+                  Sign Out
+                </>
+              )}
             </button>
           </div>
         ) : (
