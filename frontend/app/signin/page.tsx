@@ -49,6 +49,34 @@ function SignInContent() {
     }
   };
 
+  const handleGuestLogin = async () => {
+    setLoading(true);
+    try {
+      const res = await apiClient.post("/api/v1/auth/signin", {
+        email: "alone@gmail.com",
+        password: "Single@f",
+      });
+      const data = res.data;
+      if (data.success) {
+        setToken(data.data.accessToken);
+        const userData = await checkAuth();
+        if (userData) {
+          toast.success(`Welcome, ${userData.username}!`);
+          // Update SWR cache globally
+          mutate("/api/v1/auth/me", userData);
+          const redirect = searchParams.get("redirect") || "/";
+          router.push(redirect);
+        }
+      } else {
+        toast.error(data.message || "Guest login failed");
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Guest login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-[calc(100vh-73px)] flex flex-col">
       <main className="flex-1 flex items-center justify-center p-6">
@@ -100,6 +128,17 @@ function SignInContent() {
               className="w-full bg-white text-zinc-950 font-bold py-4 rounded-xl hover:bg-zinc-100 transition-all disabled:opacity-50"
             >
               {loading ? "Signing in..." : "Continue"}
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              type="button"
+              onClick={handleGuestLogin}
+              disabled={loading}
+              className="w-full bg-emerald-500/20 text-emerald-400 font-bold py-4 rounded-xl hover:bg-emerald-500/30 border border-emerald-500/50 transition-all disabled:opacity-50"
+            >
+              {loading ? "Loading..." : "Login as Guest"}
             </motion.button>
           </form>
 
