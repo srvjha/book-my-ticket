@@ -53,8 +53,8 @@ function SignInContent() {
     setLoading(true);
     try {
       const res = await apiClient.post("/api/v1/auth/signin", {
-        email: "alone@gmail.com",
-        password: "Single@f",
+        email: process.env.NEXT_PUBLIC_GUEST_EMAIL,
+        password: process.env.NEXT_PUBLIC_GUEST_PASSWORD,
       });
       const data = res.data;
       if (data.success) {
