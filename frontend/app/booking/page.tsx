@@ -81,10 +81,12 @@ function BookingContent() {
         await loadSeats();
       } else {
         toast.error(result.message || "Booking failed.");
+        setShowConfirmation(false);
       }
     } catch (err: any) {
       console.error("Booking error", err);
       toast.error(err.response?.data?.message || "Booking failed. Please try again.");
+      setShowConfirmation(false);
     } finally {
       setBookingInProgress(false);
     }
